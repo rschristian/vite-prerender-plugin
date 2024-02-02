@@ -1,0 +1,30 @@
+{
+  "name": "vite-prerender-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./index.js",
+  "license": "MIT",
+  "description": "A Vite plugin for prerendering apps to HTML at build time",
+  "repository": "https://github.com/rschristian/vite-prerender-plugin",
+  "files": [
+    "src",
+    "LICENSE",
+    "package.json",
+    "README.md"
+  ],
+  "scripts": {
+    "format": "prettier --write --ignore-path .gitignore ."
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.16",
+    "prettier": "^3.2.4",
+    "prettier-config-rschristian": "^0.1.1",
+    "vite": "^5.0.12"
+  },
+  "prettier": "prettier-config-rschristian",
+  "dependencies": {
+    "magic-string": "^0.30.6",
+    "node-html-parser": "^6.1.12"
+  }
+}
