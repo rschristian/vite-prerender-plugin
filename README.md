@@ -21,9 +21,8 @@ To prerender your app, you'll need to do two things:
 1. Specify a script using the `prerenderScript` option OR add a `prerender` attribute to one of the scripts listed in your `index.html`, like this: `<script prerender src="...">`. This script will be the prerender entry point.
 
 2. Export a function named `prerender` from your entry point.
-
-  - This function can by sync or async
-  - All that's necessary is that this function returns an object containing an `html` property, which is a string of HTML you want injected into your template
+    - This function can by sync or async
+    - All that's necessary is that this function returns an object containing an `html` property, which is a string of HTML you want injected into your template
 
 With that, you're all ready to build!
 
