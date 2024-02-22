@@ -5,7 +5,7 @@ All-in-one tool for prerendering your Vite applications, no matter the UI librar
 ## Getting Started
 
 ```bash
-npm install vite-prerender-plugin
+$ npm install vite-prerender-plugin
 ```
 
 ```js
@@ -34,7 +34,7 @@ To prerender your app, you'll need to do three things:
 
 3. Export a function named `prerender()` from your prerender script (see below for an example)
 
-The plugin simply calls the prerender function you provide so it's up to you to determine how your app should be prerendered, likely you'll want to use the `render-to-string` implementation of your framework. This prerender function can be sync or async, so fee free to initialize your app data with `fetch()` calls, reading local data with `fs.readFile()`, etc. All that's required is that your return an object containing an `html` property, which is the string of HTML you want injected into your HTML document.
+The plugin simply calls the prerender function you provide so it's up to you to determine how your app should be prerendered, likely you'll want to use the `render-to-string` implementation of your framework. This prerender function can be sync or async, so feef free to initialize your app data with `fetch()` calls, read local data with `fs.readFile()`, etc. All that's required is that your return an object containing an `html` property which is the string of HTML you want injected into your HTML document.
 
 With that, you're all ready to build!
 
