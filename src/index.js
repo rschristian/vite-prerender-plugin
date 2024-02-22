@@ -53,7 +53,11 @@ function serializeElement(element) {
  * @param {import('./index.d.ts').PrerenderOptions} options
  * @returns {import('vite').Plugin}
  */
-export function vitePrerenderPlugin({ prerenderScript, renderTarget, additionalPrerenderRoutes } = {}) {
+export function vitePrerenderPlugin({
+    prerenderScript,
+    renderTarget,
+    additionalPrerenderRoutes,
+} = {}) {
     let viteConfig = {};
     let userEnabledSourceMaps;
 
@@ -382,11 +386,11 @@ export function vitePrerenderPlugin({ prerenderScript, renderTarget, additionalP
         async writeBundle(_opts, bundle) {
             if (!userEnabledSourceMaps) {
                 Object.keys(bundle)
-                    .filter(f => /\.map$/.test(f))
+                    .filter((f) => /\.map$/.test(f))
                     .forEach(async (f) => {
                         fs.rm(path.join(viteConfig.root, viteConfig.build.outDir, f));
                     });
             }
-        }
+        },
     };
 }
