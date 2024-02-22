@@ -5,7 +5,10 @@
   "exports": "./src/index.js",
   "license": "MIT",
   "description": "A Vite plugin for prerendering apps to HTML at build time",
-  "repository": "https://github.com/rschristian/vite-prerender-plugin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rschristian/vite-prerender-plugin.git"
+  },
   "files": [
     "src",
     "LICENSE",
