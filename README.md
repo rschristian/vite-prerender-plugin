@@ -2,6 +2,8 @@
 
 All-in-one tool for prerendering your Vite applications, no matter the UI library (so long as it has a render-to-string implementation).
 
+This is largely an extracted implementation of [`@preact/preset-vite`](https://github.com/preactjs/preset-vite)'s prererender functionality ([license](https://github.com/preactjs/preset-vite/blob/main/LICENSE)), which in turn is a reimplementation of [WMR](https://github.com/preactjs/wmr)'s prerendering ([license](https://github.com/preactjs/wmr/blob/main/LICENSE)).
+
 ## Getting Started
 
 ```bash
@@ -76,6 +78,10 @@ export async function prerender(data) {
 }
 ```
 
-## License
+## Licenses
 
 [MIT](https://github.com/rschristian/vite-prerender-plugin/blob/master/LICENSE)
+
+[WMR - MIT](https://github.com/preactjs/wmr/blob/main/LICENSE)
+
+[Preact Vite Preset - MIT](https://github.com/preactjs/preset-vite/blob/main/LICENSE)
