@@ -55,6 +55,7 @@ function serializeElement(element) {
  */
 export function vitePrerenderPlugin({ prerenderScript, renderTarget, additionalPrerenderRoutes } = {}) {
     let viteConfig = {};
+    let userEnabledSourceMaps;
 
     renderTarget ||= 'body';
     additionalPrerenderRoutes ||= [];
@@ -96,6 +97,7 @@ export function vitePrerenderPlugin({ prerenderScript, renderTarget, additionalP
         apply: 'build',
         enforce: 'post',
         configResolved(config) {
+            userEnabledSourceMaps = config.build.sourcemap;
             // Enable sourcemaps for generating more actionable error messages
             config.build.sourcemap = true;
 
@@ -377,5 +379,14 @@ export function vitePrerenderPlugin({ prerenderScript, renderTarget, additionalP
                     });
             }
         },
+        async writeBundle(_opts, bundle) {
+            if (!userEnabledSourceMaps) {
+                Object.keys(bundle)
+                    .filter(f => /\.map$/.test(f))
+                    .forEach(async (f) => {
+                        fs.rm(path.join(viteConfig.root, viteConfig.build.outDir, f));
+                    });
+            }
+        }
     };
 }
