@@ -3,6 +3,9 @@ import { promises as fs } from 'node:fs';
 
 import MagicString from 'magic-string';
 import { parse as htmlParse } from 'node-html-parser';
+import { SourceMapConsumer } from 'source-map';
+import { parse as StackTraceParse } from 'stack-trace';
+import { createCodeFrame } from 'simple-code-frame';
 
 /**
  * @param {string} str
@@ -93,6 +96,9 @@ export function PrerenderPlugin({ prerenderScript, renderTarget, additionalPrere
         apply: 'build',
         enforce: 'post',
         configResolved(config) {
+            // Enable sourcemaps for generating more actionable error messages
+            config.build.sourcemap = true;
+
             viteConfig = config;
         },
         async options(opts) {
@@ -186,6 +192,7 @@ export function PrerenderPlugin({ prerenderScript, renderTarget, additionalPrere
                 JSON.stringify({ type: 'module' }),
             );
 
+            /** @type {import('vite').Rollup.OutputChunk | undefined} */
             let prerenderEntry;
             for (const output of Object.keys(bundle)) {
                 if (!/\.js$/.test(output) || bundle[output].type !== 'chunk') continue;
@@ -200,7 +207,9 @@ export function PrerenderPlugin({ prerenderScript, renderTarget, additionalPrere
                         bundle[output]
                     ).exports?.includes('prerender')
                 ) {
-                    prerenderEntry = bundle[output];
+                    prerenderEntry = /** @type {import('vite').Rollup.OutputChunk} */ (
+                        bundle[output]
+                    );
                 }
             }
             if (!prerenderEntry) {
@@ -219,19 +228,49 @@ export function PrerenderPlugin({ prerenderScript, renderTarget, additionalPrere
             } catch (e) {
                 const isReferenceError = e instanceof ReferenceError;
 
-                const message = `
+                let message = `
 					${e}
 
 					This ${
                         isReferenceError ? 'is most likely' : 'could be'
                     } caused by using DOM/Web APIs which are not available
-					available to the prerendering process which runs in Node. Consider
+					available to the prerendering process running in Node. Consider
 					wrapping the offending code in a window check like so:
 
 					if (typeof window !== "undefined") {
 						// do something in browsers only
 					}
 				`.replace(/^\t{5}/gm, '');
+
+                const stack = StackTraceParse(e).find((s) => s.getFileName().includes(tmpDir));
+
+                const sourceMapContent = prerenderEntry.map;
+                if (stack && sourceMapContent) {
+                    await SourceMapConsumer.with(sourceMapContent, null, async (consumer) => {
+                        let { source, line, column } = consumer.originalPositionFor({
+                            line: stack.getLineNumber(),
+                            column: stack.getColumnNumber(),
+                        });
+
+                        if (!source || line == null || column == null) {
+                            message += `\nUnable to locate source map for error!\n`;
+                            this.error(message);
+                        }
+
+                        const sourcePath = path.join(
+                            viteConfig.root,
+                            source.replace(/^(..\/)*/, ''),
+                        );
+                        const sourceContent = await fs.readFile(sourcePath, 'utf-8');
+
+                        // `simple-code-frame` has 1-based line numbers
+                        const frame = createCodeFrame(sourceContent, line - 1, column);
+                        message += `
+							> ${sourcePath}:${line}:${column + 1}\n
+							${frame}
+						`.replace(/^\t{7}/gm, '');
+                    });
+                }
 
                 this.error(message);
             }
