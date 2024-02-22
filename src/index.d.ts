@@ -1,3 +1,7 @@
+import { Plugin } from 'vite';
+
+export function vitePrerenderPlugin(options?: PrerenderOptions): Plugin;
+
 export interface PrerenderOptions {
     prerenderScript?: string;
     renderTarget?: string;

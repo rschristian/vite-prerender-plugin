@@ -53,7 +53,7 @@ function serializeElement(element) {
  * @param {import('./index.d.ts').PrerenderOptions} options
  * @returns {import('vite').Plugin}
  */
-export function PrerenderPlugin({ prerenderScript, renderTarget, additionalPrerenderRoutes } = {}) {
+export function vitePrerenderPlugin({ prerenderScript, renderTarget, additionalPrerenderRoutes } = {}) {
     let viteConfig = {};
 
     renderTarget ||= 'body';
@@ -177,7 +177,7 @@ export function PrerenderPlugin({ prerenderScript, renderTarget, additionalPrere
             const tmpDir = path.join(
                 viteConfig.root,
                 'node_modules',
-                '@preact/preset-vite',
+                'vite-prerender-plugin',
                 'headless-prerender',
             );
             try {
