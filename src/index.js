@@ -158,15 +158,21 @@ export function vitePrerenderPlugin({
             // @ts-ignore
             globalThis.fetch = async (url, opts) => {
                 if (/^\//.test(url)) {
-                    const text = () =>
-                        fs.readFile(
-                            `${path.join(
-                                viteConfig.root,
-                                viteConfig.build.outDir,
-                            )}/${url.replace(/^\//, '')}`,
-                            'utf-8',
+                    try {
+                        return new Response(
+                            await fs.readFile(
+                                `${path.join(
+                                    viteConfig.root,
+                                    viteConfig.build.outDir,
+                                )}/${url.replace(/^\//, '')}`,
+                                'utf-8',
+                            ),
+                            { status: 200 },
                         );
-                    return { text, json: () => text().then(JSON.parse) };
+                    } catch (e) {
+                        if (e.code !== 'ENOENT') throw e;
+                        return new Response(null, { status: 404 });
+                    }
                 }
 
                 return nodeFetch(url, opts);
