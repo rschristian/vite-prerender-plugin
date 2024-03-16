@@ -101,7 +101,7 @@ export function vitePrerenderPlugin({
         apply: 'build',
         enforce: 'post',
         configResolved(config) {
-            userEnabledSourceMaps = config.build.sourcemap;
+            userEnabledSourceMaps = !!config.build.sourcemap;
             // Enable sourcemaps for generating more actionable error messages
             config.build.sourcemap = true;
 
@@ -207,6 +207,11 @@ export function vitePrerenderPlugin({
             /** @type {import('vite').Rollup.OutputChunk | undefined} */
             let prerenderEntry;
             for (const output of Object.keys(bundle)) {
+                // Clean up source maps if the user didn't enable them themselves
+                if (/\.map$/.test(output) && !userEnabledSourceMaps) {
+                    delete bundle[output];
+                    continue;
+                }
                 if (!/\.js$/.test(output) || bundle[output].type !== 'chunk') continue;
 
                 await fs.writeFile(
@@ -386,15 +391,6 @@ export function vitePrerenderPlugin({
                         type: 'asset',
                         fileName: assetName,
                         source: htmlDoc.toString(),
-                    });
-            }
-        },
-        async writeBundle(_opts, bundle) {
-            if (!userEnabledSourceMaps) {
-                Object.keys(bundle)
-                    .filter((f) => /\.map$/.test(f))
-                    .forEach(async (f) => {
-                        fs.rm(path.join(viteConfig.root, viteConfig.build.outDir, f));
                     });
             }
         },
