@@ -16,7 +16,7 @@
     "README.md"
   ],
   "scripts": {
-    "format": "prettier --write --ignore-path .gitignore ."
+    "format": "prettier --write --ignore-path .gitignore . !examples"
   },
   "dependencies": {
     "magic-string": "^0.30.6",
