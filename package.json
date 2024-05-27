@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.16",
-    "prettier": "^3.2.4",
+    "prettier": "^2.8.8",
     "prettier-config-rschristian": "^0.1.1",
     "vite": "^5.0.12"
   },
