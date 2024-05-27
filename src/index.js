@@ -8,6 +8,11 @@ import { parse as StackTraceParse } from 'stack-trace';
 import { createCodeFrame } from 'simple-code-frame';
 
 /**
+ * @typedef {import('vite').Rollup.OutputChunk} OutputChunk
+ * @typedef {import('vite').Rollup.OutputAsset} OutputAsset
+ */
+
+/**
  * @param {string} str
  */
 function enc(str) {
@@ -180,7 +185,7 @@ export function vitePrerenderPlugin({
 
             // Grab the generated HTML file, which we'll use as a template:
             const tpl = /** @type {string} */ (
-                /** @type {import('vite').Rollup.OutputAsset} */ (bundle['index.html']).source
+                /** @type {OutputAsset} */ (bundle['index.html']).source
             );
             let htmlDoc = htmlParse(tpl);
 
@@ -204,29 +209,32 @@ export function vitePrerenderPlugin({
                 JSON.stringify({ type: 'module' }),
             );
 
-            /** @type {import('vite').Rollup.OutputChunk | undefined} */
+            /** @type {OutputChunk | undefined} */
             let prerenderEntry;
             for (const output of Object.keys(bundle)) {
                 // Clean up source maps if the user didn't enable them themselves
-                if (/\.map$/.test(output) && !userEnabledSourceMaps) {
-                    delete bundle[output];
-                    continue;
+                if (!userEnabledSourceMaps) {
+                    if (output.endsWith('.map')) {
+                        delete bundle[output];
+                        continue;
+                    }
+                    if (output.endsWith('.js') && bundle[output].type == 'chunk') {
+                        /** @type {OutputChunk} */ (bundle[output]).code =
+                            /** @type {OutputChunk} */ (bundle[output]).code.replace(
+                                /\/\/#\ssourceMappingURL=.*$/,
+                                '',
+                            );
+                    }
                 }
-                if (!/\.js$/.test(output) || bundle[output].type !== 'chunk') continue;
+                if (!output.endsWith('.js') || bundle[output].type !== 'chunk') continue;
 
                 await fs.writeFile(
                     path.join(tmpDir, path.basename(output)),
-                    /** @type {import('vite').Rollup.OutputChunk} */ (bundle[output]).code,
+                    /** @type {OutputChunk} */ (bundle[output]).code,
                 );
 
-                if (
-                    /** @type {import('vite').Rollup.OutputChunk} */ (
-                        bundle[output]
-                    ).exports?.includes('prerender')
-                ) {
-                    prerenderEntry = /** @type {import('vite').Rollup.OutputChunk} */ (
-                        bundle[output]
-                    );
+                if (/** @type {OutputChunk} */ (bundle[output]).exports?.includes('prerender')) {
+                    prerenderEntry = /** @type {OutputChunk} */ (bundle[output]);
                 }
             }
             if (!prerenderEntry) {
@@ -384,8 +392,7 @@ export function vitePrerenderPlugin({
 
                 // Add generated HTML to compilation:
                 if (route.url === '/')
-                    /** @type {import('vite').Rollup.OutputAsset} */ (bundle['index.html']).source =
-                        htmlDoc.toString();
+                    /** @type {OutputAsset} */ (bundle['index.html']).source = htmlDoc.toString();
                 else
                     this.emitFile({
                         type: 'asset',
