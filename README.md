@@ -1,6 +1,14 @@
-# `vite-prerender-plugin`
+<h1 align="center">vite-prerender-plugin</h1>
 
-All-in-one tool for prerendering your Vite applications, no matter the UI library (so long as it has a render-to-string implementation).
+<p align="center">
+  <picture width="100">
+    <img src="./media/logo.png">
+  </picture>
+</p>
+
+<p align="center">Effortless prerendering in every framework</p>
+
+---
 
 This is largely an extracted implementation of [@preact/preset-vite](https://github.com/preactjs/preset-vite)'s prererender functionality ([license](https://github.com/preactjs/preset-vite/blob/main/LICENSE)), which in turn is a reimplementation of [WMR](https://github.com/preactjs/wmr)'s prerendering ([license](https://github.com/preactjs/wmr/blob/main/LICENSE)).
 
