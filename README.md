@@ -44,11 +44,11 @@ For full examples, please see the [examples directory](./examples), and if you d
 
 ## Options
 
-| Option                      | Type     | Default     | Description                                                                                                                                                                                                                                                     |
-| --------------------------- | -------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `renderTarget`              | `string` | `"body"`    | Query selector for where to insert prerender result in your HTML template                                                                                                                                                                                       |
-| `prerenderScript`           | `string` | `undefined` | Absolute path to script containing exported `prerender()` function. If not provided, the plugin will try to find the prerender script in the scripts listed in your HTML entrypoint                                                                             |
-| `additionalPrerenderRoutes` | `string` | `undefined` | While the prerendering process can automatically find new links in your app to prerender, sometimes you will have pages that are not linked to but you still want them prerendered (such as a `/404` page). Use this option to add them to the prerender queue  |
+| Option                      | Type     | Default     | Description                                                                                                                                                                                                                                                    |
+| --------------------------- | -------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `renderTarget`              | `string` | `"body"`    | Query selector for where to insert prerender result in your HTML template                                                                                                                                                                                      |
+| `prerenderScript`           | `string` | `undefined` | Absolute path to script containing exported `prerender()` function. If not provided, the plugin will try to find the prerender script in the scripts listed in your HTML entrypoint                                                                            |
+| `additionalPrerenderRoutes` | `string` | `undefined` | While the prerendering process can automatically find new links in your app to prerender, sometimes you will have pages that are not linked to but you still want them prerendered (such as a `/404` page). Use this option to add them to the prerender queue |
 
 ## Advanced Prerender Options
 
