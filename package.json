@@ -2,7 +2,10 @@
   "name": "vite-prerender-plugin",
   "version": "0.2.2",
   "type": "module",
-  "exports": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./parse": "./src/parse.js"
+  },
   "license": "MIT",
   "description": "A Vite plugin for prerendering apps to HTML at build time",
   "repository": {
