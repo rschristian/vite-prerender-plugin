@@ -7,7 +7,7 @@ export default defineConfig({
     plugins: [
         react(),
         vitePrerenderPlugin({
-            renderTarget: '#root',
+            renderTarget: '#app',
         })
     ],
 })
