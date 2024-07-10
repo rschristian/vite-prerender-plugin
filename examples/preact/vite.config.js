@@ -4,10 +4,10 @@ import { vitePrerenderPlugin } from 'vite-prerender-plugin';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [
-		preact(),
+    plugins: [
+        preact(),
         vitePrerenderPlugin({
             renderTarget: '#app',
         }),
-	],
+    ],
 });

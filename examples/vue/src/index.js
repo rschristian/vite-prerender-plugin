@@ -5,7 +5,7 @@ import { createWebHistory, createMemoryHistory, createRouter } from 'vue-router'
 import App from './App.vue';
 import Home from './pages/Home.vue';
 import NotFound from './pages/_404.vue';
-import './style.css'
+import './style.css';
 
 const routes = [
     { path: '/', component: Home },
@@ -18,10 +18,8 @@ if (typeof window !== 'undefined') {
         routes,
     });
 
-    const app = import.meta.env.DEV
-        ? createApp(App)
-        : createSSRApp(App);
-    app.use(router).mount('#app')
+    const app = import.meta.env.DEV ? createApp(App) : createSSRApp(App);
+    app.use(router).mount('#app');
 }
 
 export async function prerender(data) {

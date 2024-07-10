@@ -1,6 +1,5 @@
-
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue';
 
 const count = ref(0);
 </script>
@@ -43,4 +42,3 @@ const count = ref(0);
     filter: drop-shadow(0 0 2em #42b883aa);
 }
 </style>
-

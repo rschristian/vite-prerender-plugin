@@ -6,17 +6,17 @@ import { NotFound } from './pages/_404.jsx';
 import './style.css';
 
 export function App() {
-	return (
-		<LocationProvider>
-			<Header />
-			<main>
-				<Router>
-					<Route path="/" component={Home} />
-					<Route default component={NotFound} />
-				</Router>
-			</main>
-		</LocationProvider>
-	);
+    return (
+        <LocationProvider>
+            <Header />
+            <main>
+                <Router>
+                    <Route path="/" component={Home} />
+                    <Route default component={NotFound} />
+                </Router>
+            </main>
+        </LocationProvider>
+    );
 }
 
 if (typeof window !== 'undefined') {
@@ -24,5 +24,5 @@ if (typeof window !== 'undefined') {
 }
 
 export async function prerender(data) {
-	return await ssr(<App {...data} />);
+    return await ssr(<App {...data} />);
 }

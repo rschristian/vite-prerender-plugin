@@ -11,24 +11,22 @@ import './style.css';
 const Router = typeof window !== 'undefined' ? BrowserRouter : StaticRouter;
 
 export function App({ url }) {
-	return (
-		<Router location={url}>
-			<Header />
-			<main>
-				<Routes>
-					<Route path="/" element={<Home />} />
-					<Route path="*" element={<NotFound />} />
-				</Routes>
-			</main>
-		</Router>
-	);
+    return (
+        <Router location={url}>
+            <Header />
+            <main>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+            </main>
+        </Router>
+    );
 }
 
 if (typeof window !== 'undefined') {
     const target = document.getElementById('app');
-    import.meta.env.DEV
-        ? createRoot(target).render(<App />)
-        : hydrateRoot(target, <App />);
+    import.meta.env.DEV ? createRoot(target).render(<App />) : hydrateRoot(target, <App />);
 }
 
 export async function prerender(data) {
@@ -38,5 +36,5 @@ export async function prerender(data) {
     const html = await renderToString(<App {...data} />);
     const links = parseLinks(html);
 
-	return { html, links };
+    return { html, links };
 }
