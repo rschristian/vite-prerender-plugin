@@ -7,11 +7,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.3.19"
+    "vue": "^3.4.31",
+    "vue-router": "^4.4.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
-    "vite": "^5.1.4",
-    "vite-prerender-plugin": "^0.1.1"
+    "vite": "^5.3.3",
+    "vite-prerender-plugin": "^0.2.2"
   }
 }
