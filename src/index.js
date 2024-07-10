@@ -227,7 +227,7 @@ export function vitePrerenderPlugin({
                     if (output.endsWith('.js') && bundle[output].type == 'chunk') {
                         /** @type {OutputChunk} */ (bundle[output]).code =
                             /** @type {OutputChunk} */ (bundle[output]).code.replace(
-                                /\/\/#\ssourceMappingURL=.*$/,
+                                /\n\/\/#\ssourceMappingURL=.*/,
                                 '',
                             );
                     }
