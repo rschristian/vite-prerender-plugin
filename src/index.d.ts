@@ -1,26 +1,15 @@
 import { Plugin } from 'vite';
 
-export function vitePrerenderPlugin(options?: PrerenderOptions): Plugin;
-
 export interface PrerenderOptions {
     prerenderScript?: string;
     renderTarget?: string;
     additionalPrerenderRoutes?: string[];
 }
 
-interface HeadElement {
-    type: string;
-    props: Record<string, string>;
-    children?: string;
+export interface PreviewMiddlewareOptions {
+    previewMiddlewareFallback?: string;
 }
 
-interface Head {
-    lang: string;
-    title: string;
-    elements: Set<HeadElement>;
-}
+export type Options = PrerenderOptions & PreviewMiddlewareOptions;
 
-interface PrerenderedRoute {
-    url: string;
-    _discoveredBy?: PrerenderedRoute;
-}
+export function vitePrerenderPlugin(options?: Options): Plugin;
