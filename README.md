@@ -91,6 +91,28 @@ export async function prerender(data) {
 }
 ```
 
+For those not using `preact-iso` (be it not using Preact at all or simply using other tools), this library exposes a `parseLinks` function which you can use to crawl your site for links to prerender. The function takes an HTML string and returns an array of links found in the document. To be valid, they must have an `href` attribute set and the `target` attribute, if set, must be `_self`.
+
+```js
+export async function prerender() {
+    const html = `
+        <div>
+            <a href="/foo">Foo</a>
+            <a href="/bar" target="_blank">Bar</a>
+            <a href="/baz" target="_top">Baz</a>
+        </div>
+    `;
+
+    const { parseLinks } = await import('vite-prerender-plugin/parse');
+    const links = parseLinks(html); // ['/foo']
+
+    return {
+        html,
+        links: new Set(links),
+    };
+}
+```
+
 ## Licenses
 
 [MIT](https://github.com/rschristian/vite-prerender-plugin/blob/master/LICENSE)
