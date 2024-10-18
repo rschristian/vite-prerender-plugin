@@ -58,11 +58,7 @@ function serializeElement(element) {
  * @param {import('../index.d.ts').PrerenderOptions} options
  * @returns {import('vite').Plugin}
  */
-export function prerenderPlugin({
-    prerenderScript,
-    renderTarget,
-    additionalPrerenderRoutes,
-} = {}) {
+export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrerenderRoutes } = {}) {
     let viteConfig = {};
     let userEnabledSourceMaps;
 
@@ -326,10 +322,7 @@ export function prerenderPlugin({
                 const u = new URL(route.url, 'http://localhost');
                 for (const i in u) {
                     try {
-                        globalThis.location[i] =
-                            i == 'toString'
-                                ? u[i].bind(u)
-                                : String(u[i]);
+                        globalThis.location[i] = i == 'toString' ? u[i].bind(u) : String(u[i]);
                     } catch {}
                 }
 
