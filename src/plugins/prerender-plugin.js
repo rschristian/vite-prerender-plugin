@@ -354,7 +354,7 @@ export function prerenderPlugin({
 
                 let body;
                 if (result && typeof result === 'object') {
-                    if (result.html) body = result.html;
+                    if (typeof result.html !== 'undefined') body = result.html;
                     if (result.head) {
                         head = result.head;
                     }
