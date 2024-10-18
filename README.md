@@ -66,6 +66,10 @@ export async function prerender(data) {
         // prerendered (if they haven't already been)
         links: new Set(['/foo', '/bar']),
 
+        // Optional data to serialize into a script tag for use on the client:
+        //   <script type="application/json" id="prerender-data">{"url":"/"}</script>
+        data: { url: data.url },
+
         // Optionally configure and add elements to the `<head>` of
         // the prerendered HTML document
         head: {

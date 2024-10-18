@@ -358,6 +358,11 @@ export function prerenderPlugin({
                     if (result.head) {
                         head = result.head;
                     }
+                    if (result.data) {
+                        body += `<script type="application/json" id="prerender-data">${JSON.stringify(
+                            result.data,
+                        )}</script>`;
+                    }
                 } else {
                     body = result;
                 }
