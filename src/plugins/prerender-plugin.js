@@ -164,9 +164,8 @@ export function prerenderPlugin({
             // @ts-ignore
             globalThis.__VITE_PRELOAD__ = [];
 
+            globalThis.unpatchedFetch = globalThis.fetch;
             // Local, fs-based fetch implementation for prerendering
-            const nodeFetch = globalThis.fetch;
-            // @ts-ignore
             globalThis.fetch = async (url, opts) => {
                 if (/^\//.test(url)) {
                     try {
@@ -186,7 +185,7 @@ export function prerenderPlugin({
                     }
                 }
 
-                return nodeFetch(url, opts);
+                return globalThis.unpatchedFetch(url, opts);
             };
 
             // Grab the generated HTML file, which we'll use as a template:
