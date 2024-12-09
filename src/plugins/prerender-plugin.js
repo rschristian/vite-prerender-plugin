@@ -65,6 +65,9 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
     renderTarget ||= 'body';
     additionalPrerenderRoutes ||= [];
 
+    const preloadHelperId = 'vite/preload-helper';
+    const preloadPolyfillId = 'vite/modulepreload-polyfill';
+
     /**
      * From the non-external scripts in entry HTML document, find the one (if any)
      * that provides a `prerender` export
@@ -107,6 +110,22 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
             config.build.sourcemap = true;
 
             viteConfig = config;
+
+			// We're only going to alter the chunking behavior in the default cases, where the user and/or
+			// other plugins haven't already configured this. It'd be impossible to avoid breakages otherwise.
+			if (
+				Array.isArray(config.build.rollupOptions.output) ||
+				config.build.rollupOptions.output?.manualChunks
+			) {
+				return;
+			}
+
+			config.build.rollupOptions.output ??= {};
+			config.build.rollupOptions.output.manualChunks = (id) => {
+				if (id.includes(prerenderScript) || id.includes(preloadPolyfillId)) {
+					return "index";
+				}
+			};
         },
         async options(opts) {
             if (!opts.input) return;
@@ -123,15 +142,15 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
 						: { ...opts.input, prerenderEntry: prerenderScript };
             opts.preserveEntrySignatures = 'allow-extension';
         },
-        // Injects a window check into Vite's preload helper, instantly resolving
-        // the module rather than attempting to add a <link> to the document.
+        // Injects window checks into Vite's preload helper & modulepreload polyfill
         transform(code, id) {
-            // Vite keeps changing up the ID, best we can do for cross-version
-            // compat is an `includes`
             if (id.includes('vite/preload-helper')) {
+                // Injects a window check into Vite's preload helper, instantly resolving
+                // the module rather than attempting to add a <link> to the document.
+                const s = new MagicString(code);
+
                 // Through v5.0.4
                 // https://github.com/vitejs/vite/blob/b93dfe3e08f56cafe2e549efd80285a12a3dc2f0/packages/vite/src/node/plugins/importAnalysisBuild.ts#L95-L98
-                const s = new MagicString(code);
                 s.replace(
                     `if (!__VITE_IS_MODERN__ || !deps || deps.length === 0) {`,
                     `if (!__VITE_IS_MODERN__ || !deps || deps.length === 0 || typeof window === 'undefined') {`,
@@ -141,6 +160,23 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
                 s.replace(
                     `if (__VITE_IS_MODERN__ && deps && deps.length > 0) {`,
                     `if (__VITE_IS_MODERN__ && deps && deps.length > 0 && typeof window !== 'undefined') {`,
+                );
+                return {
+                    code: s.toString(),
+                    map: s.generateMap({ hires: true }),
+                };
+            } else if (id.includes(preloadPolyfillId)) {
+                const s = new MagicString(code);
+                // Replacement for `'link'` && `"link"` as the output from their tooling has
+                // differed over the years. Should be better than switching to regex.
+                // https://github.com/vitejs/vite/blob/20fdf210ee0ac0824b2db74876527cb7f378a9e8/packages/vite/src/node/plugins/modulePreloadPolyfill.ts#L62
+                s.replace(
+                    `const relList = document.createElement('link').relList;`,
+                    `if (typeof window === "undefined") return;\n  const relList = document.createElement('link').relList;`,
+                );
+                s.replace(
+                    `const relList = document.createElement("link").relList;`,
+                    `if (typeof window === "undefined") return;\n  const relList = document.createElement("link").relList;`,
                 );
                 return {
                     code: s.toString(),
