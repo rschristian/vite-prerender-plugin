@@ -219,12 +219,19 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
                         delete bundle[output];
                         continue;
                     }
-                    if (output.endsWith('.js') && bundle[output].type == 'chunk') {
-                        /** @type {OutputChunk} */ (bundle[output]).code =
-                            /** @type {OutputChunk} */ (bundle[output]).code.replace(
+                    if (output.endsWith('.js')) {
+                        if (bundle[output].type == 'chunk') {
+                            bundle[output].code = bundle[output].code.replace(
                                 /\n\/\/#\ssourceMappingURL=.*/,
                                 '',
                             );
+                        } else {
+                            // Workers and similar
+                            bundle[output].source = /** @type {string} */ (bundle[output].source).replace(
+                                /\n\/\/#\ssourceMappingURL=.*/,
+                                '',
+                            )
+                        }
                     }
                 }
                 if (!output.endsWith('.js') || bundle[output].type !== 'chunk') continue;
