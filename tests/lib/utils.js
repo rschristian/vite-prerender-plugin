@@ -14,7 +14,7 @@ export async function copyDependencies(cwd) {
         path.join(__dirname, '..', '..', 'src'),
         path.join(cwd, 'node_modules', 'vite-prerender-plugin', 'src'),
         { recursive: true },
-    )
+    );
     await fs.copyFile(
         path.join(__dirname, '..', '..', 'package.json'),
         path.join(cwd, 'node_modules', 'vite-prerender-plugin', 'package.json'),

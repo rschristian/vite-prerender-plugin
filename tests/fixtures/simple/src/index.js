@@ -1,1 +1,1 @@
-export async function prerender() {  }
+export async function prerender() {}

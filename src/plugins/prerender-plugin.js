@@ -227,10 +227,9 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
                             );
                         } else {
                             // Workers and similar
-                            bundle[output].source = /** @type {string} */ (bundle[output].source).replace(
-                                /\n\/\/#\ssourceMappingURL=.*/,
-                                '',
-                            )
+                            bundle[output].source = /** @type {string} */ (
+                                bundle[output].source
+                            ).replace(/\n\/\/#\ssourceMappingURL=.*/, '');
                         }
                     }
                 }
@@ -407,14 +406,14 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
                 target.insertAdjacentHTML('afterbegin', body);
 
                 // Add generated HTML to compilation:
-                if (route.url === '/')
-                    /** @type {OutputAsset} */ (bundle['index.html']).source = htmlDoc.toString();
-                else
-                    this.emitFile({
-                        type: 'asset',
-                        fileName: assetName,
-                        source: htmlDoc.toString(),
-                    });
+                route.url == '/'
+                    ? /** @type {OutputAsset} */ ((bundle['index.html']).source =
+                          htmlDoc.toString())
+                    : this.emitFile({
+                          type: 'asset',
+                          fileName: assetName,
+                          source: htmlDoc.toString(),
+                      });
             }
         },
     };
