@@ -144,7 +144,7 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
         },
         // Injects window checks into Vite's preload helper & modulepreload polyfill
         transform(code, id) {
-            if (id.includes('vite/preload-helper')) {
+            if (id.includes(preloadHelperId)) {
                 // Injects a window check into Vite's preload helper, instantly resolving
                 // the module rather than attempting to add a <link> to the document.
                 const s = new MagicString(code);

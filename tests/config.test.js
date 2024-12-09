@@ -4,7 +4,6 @@ import * as assert from 'uvu/assert';
 import { setupTest, teardownTest, loadFixture, viteBuild } from './lib/lifecycle.js';
 import { getOutputFile, outputFileExists, writeFixtureFile } from './lib/utils.js';
 
-
 const writeConfig = async (dir, content) => writeFixtureFile(dir, 'vite.config.js', content);
 
 let env;
