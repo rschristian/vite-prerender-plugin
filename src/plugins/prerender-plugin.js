@@ -334,7 +334,10 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
                 }
 
                 const result = await prerender({ ssr: true, url: route.url, route });
-                if (result == null) continue;
+                if (result == null) {
+                    this.warn(`No result returned for route: ${route.url}`);
+                    continue;
+                }
 
                 // Reset HTML doc & head data
                 htmlDoc = htmlParse(tpl);
