@@ -113,6 +113,8 @@ export async function prerender() {
 }
 ```
 
+> **Note**: Anything you want to be server-only, like `parseLinks` from the example above, should be dynamically imported in the prerender function. A static import will see that code included in your client bundle, inflating it for a code path that will never run.
+
 ## Licenses
 
 [MIT](https://github.com/rschristian/vite-prerender-plugin/blob/master/LICENSE)
