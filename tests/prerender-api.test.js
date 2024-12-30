@@ -56,7 +56,10 @@ test('Should stringify returned `data` object', async () => {
     await viteBuild(env.tmp.path);
 
     const prerenderedHtml = await getOutputFile(env.tmp.path, 'index.html');
-    assert.match(prerenderedHtml, '<script type="application/json" id="prerender-data">{"foo":"bar"}</script>');
+    assert.match(
+        prerenderedHtml,
+        '<script type="application/json" id="prerender-data">{"foo":"bar"}</script>',
+    );
 });
 
 test('Should support `head.lang` property', async () => {

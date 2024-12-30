@@ -126,7 +126,7 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
             config.build.rollupOptions.output ??= {};
             config.build.rollupOptions.output.manualChunks = (id) => {
                 if (id.includes(prerenderScript) || id.includes(preloadPolyfillId)) {
-                    return "index";
+                    return 'index';
                 }
             };
 
@@ -240,10 +240,7 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
 
             // Create a tmp dir to allow importing & consuming the built modules,
             // before Rollup writes them to the disk
-            const tmpDir = path.join(
-                viteConfig.root,
-                tmpDirRelative,
-            );
+            const tmpDir = path.join(viteConfig.root, tmpDirRelative);
             try {
                 await fs.rm(tmpDir, { recursive: true });
             } catch (e) {
@@ -300,7 +297,9 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
 					}
 				`.replace(/^\t{5}/gm, '');
 
-                const stack = StackTraceParse(e).find((s) => s.getFileName().includes(tmpDirRelative));
+                const stack = StackTraceParse(e).find((s) =>
+                    s.getFileName().includes(tmpDirRelative),
+                );
 
                 const sourceMapContent = prerenderEntry.map;
                 if (stack && sourceMapContent) {
