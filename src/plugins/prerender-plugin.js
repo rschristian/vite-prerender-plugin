@@ -68,6 +68,10 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
     const preloadHelperId = 'vite/preload-helper';
     const preloadPolyfillId = 'vite/modulepreload-polyfill';
 
+    // PNPM, Yalc, and anything else utilizing symlinks mangle the file
+    // path a bit so we need a minimal, fairly unique ID to check against
+    const tmpDirId = 'headless-prerender';
+
     /**
      * From the non-external scripts in entry HTML document, find the one (if any)
      * that provides a `prerender` export
@@ -231,16 +235,14 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
             );
             let htmlDoc = htmlParse(tpl);
 
-            // Workaround for PNPM mangling file paths with their symlinks
-            const tmpDirRelative = path.join(
-                'node_modules',
-                'vite-prerender-plugin',
-                'headless-prerender',
-            );
-
             // Create a tmp dir to allow importing & consuming the built modules,
             // before Rollup writes them to the disk
-            const tmpDir = path.join(viteConfig.root, tmpDirRelative);
+            const tmpDir = path.join(
+                viteConfig.root,
+                'node_modules',
+                'vite-prerender-plugin',
+                tmpDirId
+            );
             try {
                 await fs.rm(tmpDir, { recursive: true });
             } catch (e) {
@@ -298,7 +300,7 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
 				`.replace(/^\t{5}/gm, '');
 
                 const stack = StackTraceParse(e).find((s) =>
-                    s.getFileName().includes(tmpDirRelative),
+                    s.getFileName().includes(tmpDirId),
                 );
 
                 const sourceMapContent = prerenderEntry.map;
