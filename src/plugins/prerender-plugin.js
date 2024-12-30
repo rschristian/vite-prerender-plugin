@@ -104,28 +104,33 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
         name: 'vite-prerender-plugin',
         apply: 'build',
         enforce: 'post',
-        configResolved(config) {
-            userEnabledSourceMaps = !!config.build.sourcemap;
+        // Vite is pretty inconsistent with how it resolves config options, both
+        // hooks are needed to set their respective options. ¯\_(ツ)_/¯
+        config(config) {
+            userEnabledSourceMaps = !!config.build?.sourcemap;
+
             // Enable sourcemaps for generating more actionable error messages
+            config.build ??= {};
             config.build.sourcemap = true;
+        },
+        configResolved(config) {
+            // We're only going to alter the chunking behavior in the default cases, where the user and/or
+            // other plugins haven't already configured this. It'd be impossible to avoid breakages otherwise.
+            if (
+                Array.isArray(config.build.rollupOptions.output) ||
+                config.build.rollupOptions.output?.manualChunks
+            ) {
+                return;
+            }
+
+            config.build.rollupOptions.output ??= {};
+            config.build.rollupOptions.output.manualChunks = (id) => {
+                if (id.includes(prerenderScript) || id.includes(preloadPolyfillId)) {
+                    return "index";
+                }
+            };
 
             viteConfig = config;
-
-			// We're only going to alter the chunking behavior in the default cases, where the user and/or
-			// other plugins haven't already configured this. It'd be impossible to avoid breakages otherwise.
-			if (
-				Array.isArray(config.build.rollupOptions.output) ||
-				config.build.rollupOptions.output?.manualChunks
-			) {
-				return;
-			}
-
-			config.build.rollupOptions.output ??= {};
-			config.build.rollupOptions.output.manualChunks = (id) => {
-				if (id.includes(prerenderScript) || id.includes(preloadPolyfillId)) {
-					return "index";
-				}
-			};
         },
         async options(opts) {
             if (!opts.input) return;
@@ -226,13 +231,18 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
             );
             let htmlDoc = htmlParse(tpl);
 
+            // Workaround for PNPM mangling file paths with their symlinks
+            const tmpDirRelative = path.join(
+                'node_modules',
+                'vite-prerender-plugin',
+                'headless-prerender',
+            );
+
             // Create a tmp dir to allow importing & consuming the built modules,
             // before Rollup writes them to the disk
             const tmpDir = path.join(
                 viteConfig.root,
-                'node_modules',
-                'vite-prerender-plugin',
-                'headless-prerender',
+                tmpDirRelative,
             );
             try {
                 await fs.rm(tmpDir, { recursive: true });
@@ -249,26 +259,6 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
             /** @type {OutputChunk | undefined} */
             let prerenderEntry;
             for (const output of Object.keys(bundle)) {
-                // Clean up source maps if the user didn't enable them themselves
-                if (!userEnabledSourceMaps) {
-                    if (output.endsWith('.map')) {
-                        delete bundle[output];
-                        continue;
-                    }
-                    if (output.endsWith('.js')) {
-                        if (bundle[output].type == 'chunk') {
-                            bundle[output].code = bundle[output].code.replace(
-                                /\n\/\/#\ssourceMappingURL=.*/,
-                                '',
-                            );
-                        } else {
-                            // Workers and similar
-                            bundle[output].source = /** @type {string} */ (
-                                bundle[output].source
-                            ).replace(/\n\/\/#\ssourceMappingURL=.*/, '');
-                        }
-                    }
-                }
                 if (!output.endsWith('.js') || bundle[output].type !== 'chunk') continue;
 
                 await fs.writeFile(
@@ -310,7 +300,7 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
 					}
 				`.replace(/^\t{5}/gm, '');
 
-                const stack = StackTraceParse(e).find((s) => s.getFileName().includes(tmpDir));
+                const stack = StackTraceParse(e).find((s) => s.getFileName().includes(tmpDirRelative));
 
                 const sourceMapContent = prerenderEntry.map;
                 if (stack && sourceMapContent) {
@@ -443,13 +433,31 @@ export function prerenderPlugin({ prerenderScript, renderTarget, additionalPrere
 
                 // Add generated HTML to compilation:
                 route.url == '/'
-                    ? /** @type {OutputAsset} */ ((bundle['index.html']).source =
+                    ? (/** @type {OutputAsset} */ (bundle['index.html']).source =
                           htmlDoc.toString())
                     : this.emitFile({
                           type: 'asset',
                           fileName: assetName,
                           source: htmlDoc.toString(),
                       });
+
+                // Clean up source maps if the user didn't enable them themselves
+                if (!userEnabledSourceMaps) {
+                    for (const output of Object.keys(bundle)) {
+                        if (output.endsWith('.map')) {
+                            delete bundle[output];
+                            continue;
+                        }
+
+                        if (output.endsWith('.js')) {
+                            const codeOrSource = bundle[output].type == 'chunk' ? 'code' : 'source';
+                            bundle[output][codeOrSource] = bundle[output][codeOrSource].replace(
+                                /\n\/\/#\ssourceMappingURL=.*/,
+                                '',
+                            );
+                        }
+                    }
+                }
             }
         },
     };
